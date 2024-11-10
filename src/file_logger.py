@@ -7,8 +7,8 @@ def setup_logger(file_name: str, log_file: str) -> logging.Logger:
 
     # Создаем директорию для логов, если она не существует
     CURRENT_DIR = os.path.dirname(__file__)  # отталкиваемся от директории модуля file_logger.py
-    ROOT_DIR = os.path.join(CURRENT_DIR, '..')  # это корень проекта, где pyproject.toml и от него уже строим пути
-    LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
+    ROOT_DIR = os.path.join(CURRENT_DIR, "..")  # это корень проекта, где pyproject.toml и от него уже строим пути
+    LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 
     os.makedirs("logs", exist_ok=True)
 
