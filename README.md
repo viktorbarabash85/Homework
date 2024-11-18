@@ -1,4 +1,4 @@
-># Проект "homework_12_2"
+># Проект "homework_13_1"
 ___
 >## Содержание
 - [Описание проекта](#описание-проекта-)
@@ -8,8 +8,8 @@ ___
 - [Запуск функций в файле `main.py` в корне проекта](#запуск-функций-в-файле-mainpy-в-корне-проекта--)
 - [Тестирование](#тестирование-)
 - [JSON-файл](#json-файл--)
+- [CSV- и XLSX-файлы](#csv--и-xlsx-файлы--)
 - [Логгирование](#логгирование--)
-
 
 
 ___
@@ -29,8 +29,12 @@ ___
 - [Пример работы функций в модуле `decorators.py`:](#p-stylecolorsteelblue-пример-работы-функций-в-модуле-decoratorspy--p)
   - [Функция декоратор `log`](#функция-декоратор-log)
 - [JSON-файл. Пример работы функций в модулях `utils` и `external_api`:](#p-stylecolorsteelblue-json-файл-пример-работы-функций-в-модулях-utils-и-external_api--p)
-  - [Функция  `read_json_file`](#функция-read_json_file)
-  - [Функция  `api_convert_currency`](#функция-api_convert_currency)
+  - [Функция `read_json_file`](#функция-read_json_file)
+  - [Функция `api_convert_currency`](#функция-api_convert_currency)
+- [CSV- и XLSX-файлы. Пример работы функций в модуле `finance_reader.py`:](#csv--и-xlsx-файлы-пример-работы-функций-в-модуле-finance_readerpy--)
+  - [Функция `read_transactions_from_csv`](#функция-read_transactions_from_csv)
+  - [Функция `read_transactions_from_excel`](#функция-read_transactions_from_excel)
+
 >___
 
 
@@ -38,10 +42,14 @@ ___
 
 ## Описание проекта [⮭](#содержание)
 
-Проект "homework_12_2" является продолжением работы над виджетом банковских операций клиента, 
+Проект "homework_13_1" является продолжением работы над виджетом банковских операций клиента, 
 функционал которого уже частично реализован в предыдущих проектах: 
-`homework_9_1`, `homework_9_2`, `homework_10_1`, `homework_10_2`, `homework_11_1`, `homework_11_2`, `homework_12_1`. 
-В качестве входных данных для многих функций теперь можно использовать данные, полученные из JSON-файла.
+`homework_9_1`, `homework_9_2`, `homework_10_1`, `homework_10_2`, `homework_11_1`, `homework_11_2`, `homework_12_1`, 
+`homework_12_2`. 
+В качестве входных данных для многих функций теперь можно использовать данные, полученные не только из JSON-файла, 
+но и CSV- или XLSX-файлов.
+
+
 
 В модуле `processing.py` функция [filter_by_state](#функция-filter_by_state), которая принимает список словарей 
 и опционально значение для ключа 
@@ -102,7 +110,8 @@ ___
 ## Тестирование [⮭](#содержание)
 
 Тесты написаны ко всем функциям проекта в модулях: `test_masks.py`, `test_widjet.py`, `test_processing.py`,
-`test_generators.py`. 
+`test_generators.py`, `test_decorators.py`, `conftest.py`, `test_external_api.py`, `test_utils.py`, 
+`test_finance_reader.py`. 
 Все тесты расположены в папке `tests\`.
 
 Для их запуска необходимо установить `pytest`, выполнив команду:
@@ -133,7 +142,19 @@ ___
 </details>
 
 
+___
 
+## CSV- и XLSX-файлы [⮭](#содержание) 
+<details><summary>  Описание обработки CSV- и XLSX-файлов:
+ </summary>
+
+1. Файлы  `transactions.csv` и `transactions_excel.xlsx` размещены в директории `data` в корне проекта.
+2. Создан модуль `finance_reader.py` в пакете `src`.
+3. Реализована функция чтения CSV- и XLSX-файла в модуле `finance_reader.py`.
+4. Функция чтения CSV- и XLSX-файла принимает путь к файлу JSON в качестве аргумента.
+5. Функция чтения CSV- и XLSX-файла возвращает список словарей с данными финансовых операций.
+6. .
+</details>
 
 
 
@@ -516,7 +537,7 @@ my_function error: тип ошибки. Inputs: (1, 2), {}
 
 ___
 
-### Функция  `read_json_file`
+### Функция `read_json_file`
 <details><summary> Описание функции: </summary>
 
 - Функцию размещена в модуле `utils`.
@@ -527,7 +548,7 @@ ___
  Ссылка на файл: [operations.json](https://drive.google.com/file/d/1C0bUdTxUhck-7BoqXSR1wIEp33BH5YXy/view).
 </details>
 
-### Функция  `api_convert_currency`
+### Функция `api_convert_currency`
 <details><summary> Описание функции: </summary>
 
 - Функция-конвертация размещена в модуле `external_api`.
@@ -538,3 +559,61 @@ ___
 - Для конвертации валюты применяется `Exchange Rates Data API`:
 https://apilayer.com/exchangerates_data-api.
 </details>
+
+___
+
+
+##  CSV- и XLSX-файлы. Пример работы функций в модуле `finance_reader.py`: [⮭](#содержание)  
+
+___
+Скачайте файлы [transactions.csv](https://github.com/skypro-008/transactions/blob/main/transactions.csv) 
+и [transactions_excel.xlsx](https://github.com/skypro-008/transactions/blob/main/transactions_excel.xlsx) 
+для работы над задачами и разместите их в папку `data` в корне проекта (если их там еще нет).
+
+Пример использования
+
+```python
+csv_file_path = 'data/transactions.csv'
+excel_file_path = 'data/transactions_excel.xlsx'
+print(read_transactions_from_csv(csv_file_path, nrows=2))
+print(read_transactions_from_excel(excel_file_path, nrows=2))
+```
+или
+```python
+csv_file_path = read_transactions_from_csv('data/transactions.csv')
+excel_file_path = read_transactions_from_excel('data/transactions_excel.xlsx')
+```
+
+### Функция `read_transactions_from_csv`
+<details><summary> Описание функции: </summary>
+
+- Читает транзакции из файла CSV
+- Параметры:
+  - `file_path` (str): Путь к файлу CSV, который необходимо прочитать.
+  - `nrows` (int, optional): Количество строк для чтения из файла. Если не указано, читаются все строки.
+  - `delimiter` (str, optional): Символ, используемый для разделения значений в CSV файлелч (по умоанию запятая).
+- Возвращает: 
+  - Список словарей, где каждый словарь представляет собой строку данных из файла. 
+  - Если файл пуст или не содержит данных, возвращает пустой список.
+- Исключения:
+  - `FileNotFoundError`: Выбрасывается, если указанный файл не найден.
+  - `Exception`: Выбрасывается для других ошибок, связанных с чтением файла.
+ </details>
+
+### Функция `read_transactions_from_excel`
+<details><summary> Описание функции: </summary>
+
+- Читает транзакции из файла Excel.
+- Параметры:
+  - `file_path` (str): Путь к файлу Excel, который необходимо прочитать.
+  - `nrows` (int, optional): Количество строк для чтения из файла. Если не указано, читаются все строки.
+- Возвращает:
+  - Список словарей, где каждый словарь представляет собой строку данных из файла. 
+  - Если файл пуст, возвращает пустой список.
+- Исключения:
+  - `FileNotFoundError`: Выбрасывается, если указанный файл не найден.
+  - `Exception`: Выбрасывается для других ошибок, связанных с чтением файла.
+</details>
+
+
+
