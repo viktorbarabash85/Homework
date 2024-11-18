@@ -1,1 +1,1 @@
-example_function ok. Result: 500
+
