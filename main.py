@@ -1,7 +1,12 @@
-import os.path
+"""
+Импорты активируются при распаковке запуска функции homwork_12_1 (:140)
+"""
+
+import os
 
 from src.decorators import log
 from src.external_api import api_convert_currency
+from src.finance_reader import read_transactions_from_csv, read_transactions_from_excel
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
@@ -131,13 +136,41 @@ def my_function(x: int, y: int) -> int:
 my_function(1, 2)
 print("_" * 13)  # для разделения
 
-# homwork_12_1
-current_dir = os.path.dirname(os.path.abspath(__file__))
-file_path = os.path.join(current_dir, "data", "operations.json")
-transactions_json = read_json_file(file_path)
+"""
+homwork_12_1. Считывание транзакций по API. Длязапуска раскомменетируйте строки кода
+"""
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# file_path = os.path.join(current_dir, "data", "operations.json")
+# transactions_json = read_json_file(file_path)
+#
+# for transaction in transactions_json:
+#     rub_amount = api_convert_currency(transaction)
+#     print(f"Transaction amount in RUB: {rub_amount}")
 
-for transaction in transactions_json:
-    rub_amount = api_convert_currency(transaction)
-    print(f"Transaction amount in RUB: {rub_amount}")
+print("_" * 13)  # для разделения
 
+
+"""
+homwork_13_1 считывание финансовых операций из CSV- и XLSX-файлов
+"""
+print("homwork_13_1 считывание финансовых операций из CSV- и XLSX-файлов\n")
+csv_file_path = "data/transactions.csv"
+excel_file_path = "data/transactions_excel.xlsx"
+
+print(f"Чтение транзакций из CSV файла ({csv_file_path})\n")
+# Укажите значение nrows для количества вывода строк. Без значения выведет все строки
+print(read_transactions_from_csv(csv_file_path, nrows=2))
+print(f"\nВыведено из CSV файла ({csv_file_path}):")
+print(
+    f"\nОбщее количество транзакций из CSV файла ({csv_file_path}): {len(read_transactions_from_csv(csv_file_path))}"
+)
+print("_" * 13)  # для разделения
+
+print(f"Чтение транзакций из Excel файла ({excel_file_path})\n")
+# Укажите значение nrows для количества вывода строк. Без значения выведет все строки
+print(read_transactions_from_excel(excel_file_path, nrows=2))
+print(
+    f"\nОбщее количество транзакций из Excel файла ({excel_file_path}): "
+    f"{len(read_transactions_from_excel(excel_file_path))}"
+)
 print("_" * 13)  # для разделения
