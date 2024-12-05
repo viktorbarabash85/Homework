@@ -1,13 +1,16 @@
-# Тест записи в файл при успешной работе функции.
-
 import os
-
 import pytest
 
 from src.decorators import log
 
 
 def test_log_file() -> None:
+    """
+    Тест записи в файл при успешной работе функции.
+
+    Проверяет, что функция example_function корректно записывает результат
+    в файл mylog.txt при успешном выполнении.
+    """
     @log(filename="mylog.txt")
     def example_function(x: int, y: int) -> int:
         return x * y
@@ -22,10 +25,13 @@ def test_log_file() -> None:
     assert result == 500
 
 
-# Тест вывода в консоль при успешной работе функции.
-
-
 def test_log_console(capsys: pytest.CaptureFixture) -> None:
+    """
+    Тест вывода в консоль при успешной работе функции.
+
+    Проверяет, что функция example_function корректно выводит результат
+    в консоль при успешном выполнении.
+    """
     @log()
     def example_function(x: int, y: int) -> int:
         return x * y
@@ -38,10 +44,13 @@ def test_log_console(capsys: pytest.CaptureFixture) -> None:
     assert result == 500
 
 
-# Тест записи в файл, если произошла ошибка.
-
-
 def test_log_file_raise() -> None:
+    """
+    Тест записи в файл, если произошла ошибка.
+
+    Проверяет, что при возникновении исключения TypeError функция
+    example_function записывает информацию об ошибке в файл mylog.txt.
+    """
     @log(filename="mylog.txt")
     def example_function(x: int, y: int) -> None:
         raise TypeError("Что-то пошло не так")
@@ -56,10 +65,13 @@ def test_log_file_raise() -> None:
     assert log_string == "example_function TypeError: Что-то пошло не так. Inputs: (5, 100), {}\n"
 
 
-# Тест вывода в консоль, если произошла ошибка.
-
-
 def test_log_console_raise(capsys: pytest.CaptureFixture) -> None:
+    """
+    Тест вывода в консоль, если произошла ошибка.
+
+    Проверяет, что при возникновении исключения ValueError функция
+    example_function выводит информацию об ошибке в консоль.
+    """
     @log()
     def example_function(x: int, y: int) -> None:
         raise ValueError("Что-то пошло не так")

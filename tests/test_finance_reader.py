@@ -12,7 +12,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv(self, mock_read_csv: Any) -> None:
-        """Тестирование функции чтения транзакций из CSV файла."""
+        """Тестирование функции чтения транзакций из CSV файла.
+
+        В данном тесте используется мок объекта pandas.read_csv для имитации
+        чтения данных из CSV файла. Проверяется, что функция возвращает
+        корректный список словарей, соответствующий ожидаемым данным.
+        """
         mock_read_csv.return_value = pd.DataFrame(
             {
                 "id": [1],
@@ -44,7 +49,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv_with_nrows(self, mock_read_csv: Any) -> None:
-        """Тестирование функции чтения транзакций из CSV файла с параметром nrows."""
+        """Тестирование функции чтения транзакций из CSV файла с параметром nrows.
+
+        Этот тест проверяет, что при использовании параметра nrows функция
+        корректно загружает только указанное количество строк из CSV файла.
+        В данном случае проверяется, что возвращается только первая строка.
+        """
         mock_read_csv.return_value = pd.DataFrame(
             {
                 "id": [1, 2],
@@ -78,7 +88,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_excel")
     def test_read_transactions_from_excel(self, mock_read_excel: Any) -> None:
-        """Тестирование функции чтения транзакций из Excel файла."""
+        """Тестирование функции чтения транзакций из Excel файла.
+
+        В этом тесте используется мок объекта pandas.read_excel для имитации
+        чтения данных из Excel файла. Проверяется, что функция возвращает
+        корректный список словарей, соответствующий ожидаемым данным.
+        """
         mock_read_excel.return_value = pd.DataFrame(
             {
                 "id": [1],
@@ -110,7 +125,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_excel")
     def test_read_transactions_from_excel_with_nrows(self, mock_read_excel: Any) -> None:
-        """Тестирование функции чтения транзакций из Excel файла с параметром nrows."""
+        """Тестирование функции чтения транзакций из Excel файла с параметром nrows.
+
+        Этот тест проверяет, что при использовании параметра nrows функция
+        корректно загружает только указанное количество строк из Excel файла.
+        В данном случае проверяется, что возвращается только первая строка.
+        """
         mock_read_excel.return_value = pd.DataFrame(
             {
                 "id": [1, 2],
@@ -144,7 +164,11 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv_empty(self, mock_read_csv: Any) -> None:
-        """Тестирование функции чтения транзакций из пустого CSV файла."""
+        """Тестирование функции чтения транзакций из пустого CSV файла.
+
+        В этом тесте проверяется, что функция возвращает пустой список,
+        если CSV файл не содержит данных (т.е. он пустой).
+        """
         mock_read_csv.return_value = pd.DataFrame(
             columns=["id", "state", "date", "amount", "currency_name", "currency_code", "from", "to", "description"]
         )
@@ -154,7 +178,11 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_excel")
     def test_read_transactions_from_excel_empty(self, mock_read_excel: Any) -> None:
-        """Тестирование функции чтения транзакций из пустого Excel файла."""
+        """Тестирование функции чтения транзакций из пустого Excel файла.
+
+        В этом тесте проверяется, что функция возвращает пустой список,
+        если Excel файл не содержит данных (т.е. он пустой).
+        """
         mock_read_excel.return_value = pd.DataFrame(
             columns=["id", "state", "date", "amount", "currency_name", "currency_code", "from", "to", "description"]
         )
@@ -164,7 +192,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv_file_not_found(self, mock_read_csv: Any) -> None:
-        """Тестирование обработки ошибки при отсутствии файла CSV."""
+        """Тестирование обработки ошибки при отсутствии файла CSV.
+
+        В этом тесте проверяется, что функция корректно обрабатывает
+        ситуацию, когда указанный CSV файл не найден, и выбрасывает
+        исключение FileNotFoundError с соответствующим сообщением.
+        """
         mock_read_csv.side_effect = FileNotFoundError
         with self.assertRaises(FileNotFoundError) as context:
             read_transactions_from_csv("fiction_path.csv")
@@ -172,7 +205,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_excel")
     def test_read_transactions_from_excel_file_not_found(self, mock_read_excel: Any) -> None:
-        """Тестирование обработки ошибки при отсутствии файла Excel."""
+        """Тестирование обработки ошибки при отсутствии файла Excel.
+
+        В этом тесте проверяется, что функция корректно обрабатывает
+        ситуацию, когда указанный Excel файл не найден, и выбрасывает
+        исключение FileNotFoundError с соответствующим сообщением.
+        """
         mock_read_excel.side_effect = FileNotFoundError
         with self.assertRaises(FileNotFoundError) as context:
             read_transactions_from_excel("fiction_path.xlsx")
@@ -180,7 +218,13 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv_value_error(self, mock_read_csv: Any) -> None:
-        """Тестирование обработки ошибки формата файла CSV."""
+        """Тестирование обработки ошибки формата файла CSV.
+
+        В этом тесте проверяется, что функция корректно обрабатывает
+        исключение ValueError, возникающее при попытке чтения
+        некорректного формата CSV файла, и выбрасывает общее исключение
+        с соответствующим сообщением.
+        """
         mock_read_csv.side_effect = ValueError("Ошибка формата файла.")
         with self.assertRaises(Exception) as context:
             read_transactions_from_csv("fiction_path.csv")
@@ -188,7 +232,13 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_excel")
     def test_read_transactions_from_excel_value_error(self, mock_read_excel: Any) -> None:
-        """Тестирование обработки ошибки формата файла Excel."""
+        """Тестирование обработки ошибки формата файла Excel.
+
+        В этом тесте проверяется, что функция корректно обрабатывает
+        исключение ValueError, возникающее при попытке чтения
+        некорректного формата Excel файла, и выбрасывает общее исключение
+        с соответствующим сообщением.
+        """
         mock_read_excel.side_effect = ValueError("Ошибка формата файла.")
         with self.assertRaises(Exception) as context:
             read_transactions_from_excel("fiction_path.xlsx")
@@ -196,7 +246,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv_general_exception(self, mock_read_csv: Any) -> None:
-        """Тестирование обработки общего исключения при чтении CSV."""
+        """Тестирование обработки общего исключения при чтении CSV.
+
+        В этом тесте проверяется, что функция корректно обрабатывает
+        любые общие исключения, возникающие во время чтения CSV файла,
+        и выбрасывает общее исключение с соответствующим сообщением.
+        """
         mock_read_csv.side_effect = Exception("Общая ошибка")
         with self.assertRaises(Exception) as context:
             read_transactions_from_csv("dummy_path.csv")
@@ -204,7 +259,12 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_excel")
     def test_read_transactions_from_excel_general_exception(self, mock_read_excel: Any) -> None:
-        """Тестирование обработки общего исключения при чтении Excel."""
+        """Тестирование обработки общего исключения при чтении Excel.
+
+        В этом тесте проверяется, что функция корректно обрабатывает
+        любые общие исключения, возникающие во время чтения Excel файла,
+        и выбрасывает общее исключение с соответствующим сообщением.
+        """
         mock_read_excel.side_effect = Exception("Общая ошибка")
         with self.assertRaises(Exception) as context:
             read_transactions_from_excel("dummy_path.xlsx")

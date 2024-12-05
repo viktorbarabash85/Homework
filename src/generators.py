@@ -9,9 +9,13 @@ def filter_by_currency(transactions: Iterable[dict], currency_code: str) -> Iter
     и возвращает итератор, который поочередно выдает транзакции,
     где валюта операции соответствует заданной (например, USD).
     """
+    # for transaction in transactions:
+    #     if transaction["operationAmount"]["currency"]["code"] == currency_code:
+    #         yield transaction
     for transaction in transactions:
-        if transaction["operationAmount"]["currency"]["code"] == currency_code:
-            yield transaction
+        if isinstance(transaction, dict) and "operationAmount" in transaction:
+            if transaction["operationAmount"]["currency"]["code"] == currency_code:
+                yield transaction  # Возвращаем транзакцию, если она соответствует валюте
 
 
 def transaction_descriptions(transactions: Iterable[dict]) -> Iterator[str]:

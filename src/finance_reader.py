@@ -1,19 +1,20 @@
 from typing import Any, Dict, List, Optional
-
 import pandas as pd
 
 
 def read_transactions_from_csv(
-    file_path: str, nrows: Optional[int] = None, delimiter: str = ","
+        file_path: str, nrows: Optional[int] = None, delimiter: str = ","
 ) -> List[Dict[str, Any]]:
     """
     Чтение транзакций из CSV файла.
-    Вход:
-    - file_path Путь к CSV файлу.
-    - nrows: Количество строк для чтения. Если None, читаются все строки.
-    - delimiter: Символ-разделитель в CSV файле (, или ;).
-    Выход:
-    Список транзакций, где каждая транзакция представлена в виде словаря.
+
+    :param file_path: Путь к CSV файлу.
+    :param nrows: Количество строк для чтения. Если None, читаются все строки.
+    :param delimiter: Символ-разделитель в CSV файле (например, ',' или ';').
+    :return: Список транзакций, где каждая транзакция представлена в виде словаря.
+
+    :raises FileNotFoundError: Если файл не найден.
+    :raises Exception: Если произошла ошибка при чтении CSV файла.
     """
     try:
         df = pd.read_csv(file_path, nrows=nrows, delimiter=delimiter)
@@ -32,11 +33,13 @@ def read_transactions_from_csv(
 def read_transactions_from_excel(file_path: str, nrows: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Чтение транзакций из Excel файла.
-    Вход:
-    - file_path: Путь к Excel файлу.
-    - nrows: Количество строк для чтения. Если None, читаются все строки.
-    Выход:
-    - Список транзакций, где каждая транзакция представлена в виде словаря.
+
+    :param file_path: Путь к Excel файлу.
+    :param nrows: Количество строк для чтения. Если None, читаются все строки.
+    :return: Список транзакций, где каждая транзакция представлена в виде словаря.
+
+    :raises FileNotFoundError: Если файл не найден.
+    :raises Exception: Если произошла ошибка при чтении Excel файла.
     """
     try:
         df = pd.read_excel(file_path, nrows=nrows)

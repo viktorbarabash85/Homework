@@ -8,9 +8,14 @@ logger = setup_logger("masks", "masks")
 
 def get_mask_card_number(card_number: Union[int, str]) -> Union[str]:
     """Маскирует номер банковской карты"""
-    card_number_str = str(card_number)
-    if card_number_str.isdigit() and int(card_number) != 0 and len(card_number_str) == 16:
-        masked_number = " ".join([card_number_str[:4], card_number_str[4:6] + "*" * 2, "*" * 4, card_number_str[-4:]])
+    # Преобразуем номер карты в строку и удаляем пробелы
+    card_number_str = str(card_number).strip()
+
+    # Убираем пробелы и проверяем, что длина номера 16 и состоит только из цифр
+    card_number_str = card_number_str.replace(" ", "")
+
+    if len(card_number_str) == 16 and card_number_str.isdigit():
+        masked_number = f"{card_number_str[:4]} {card_number_str[4:6]}** **** {card_number_str[-4:]}"
         logger.info("Успешно замаскирован номер карты.")
         return masked_number
     else:

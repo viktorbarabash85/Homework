@@ -1,6 +1,7 @@
 import json
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
+from typing import Any, List
 
 from src.utils import read_json_file
 
@@ -10,10 +11,10 @@ class TestExternalAPI(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data='[{"transaction": "data1"}, {"transaction": "data2"}]')
     def test_read_json_file_correct(self, mock_file: MagicMock) -> None:
         """
-        Тестирование корректности существовующего файла
+        Тестирование корректности существующего файла
         """
-        expected_data = [{"transaction": "data1"}, {"transaction": "data2"}]
-        result = read_json_file("fake_path.json")
+        expected_data: List[dict[str, str]] = [{"transaction": "data1"}, {"transaction": "data2"}]
+        result: Any = read_json_file("fake_path.json")
         self.assertEqual(result, expected_data)
         mock_file.assert_called_once_with("fake_path.json", "r", encoding="utf-8")
 
@@ -22,7 +23,7 @@ class TestExternalAPI(unittest.TestCase):
         """
         Тестирование корректности файла при нарушенном соединении
         """
-        result = read_json_file("fake_path.json")
+        result: Any = read_json_file("fake_path.json")
         self.assertEqual(result, [])
         mock_file.assert_called_once_with("fake_path.json", "r", encoding="utf-8")
 
@@ -31,26 +32,26 @@ class TestExternalAPI(unittest.TestCase):
         """
         Тестирование работоспособности при пустом файле
         """
-        result = read_json_file("fake_path.json")
+        result: Any = read_json_file("fake_path.json")
         self.assertEqual(result, [])
         mock_file.assert_called_once_with("fake_path.json", "r", encoding="utf-8")
 
     @patch("builtins.open", new_callable=mock_open, read_data="")
     def test_read_json_file_not_found(self, mock_file: MagicMock) -> None:
         """
-        Тестирование работоспособности при jотсутствующем json-файле
+        Тестирование работоспособности при отсутствующем json-файле
         """
-        result = read_json_file("fake_path.json")
+        result: Any = read_json_file("fake_path.json")
         self.assertEqual(result, [])
         mock_file.assert_called_once_with("fake_path.json", "r", encoding="utf-8")
 
     @patch("builtins.open", new_callable=mock_open, read_data='[{"transaction": "data"}')
-    @patch("json.load", dide_effect=json.JSONDecodeError("Expecting value", "", 0))
+    @patch("json.load", side_effect=json.JSONDecodeError("Expecting value", "", 0))
     def test_read_json_file_decode_error(self, mock_json_load: MagicMock, mock_file: MagicMock) -> None:
         """
-        Тестирование декодирования чтения json-файла c ошибкой
+        Тестирование декодирования чтения json-файла с ошибкой
         """
-        result = read_json_file("fake_path.json")
+        result: Any = read_json_file("fake_path.json")
         self.assertEqual(result, [])
         mock_file.assert_called_once_with("fake_path.json", "r", encoding="utf-8")
         mock_json_load.assert_called_once()

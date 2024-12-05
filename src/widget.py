@@ -1,33 +1,35 @@
 from typing import Union
-
+from src.masks import get_mask_account, get_mask_card_number
 # import datetime
 
 
-def mask_account_card(card_info: Union[str]) -> Union[str]:
+def mask_account_card(card_info: Union[str, float]) -> Union[str]:
     """
     Маскирует информацию о карте или счете с применением функций из masks.py
     """
-    from src.masks import get_mask_account, get_mask_card_number
+    # Проверка на пустое значение или неверный тип
+    if not isinstance(card_info, str) or card_info.strip() == "":
+        return "Неизвестный тип карты или данные отсутствуют"
 
     # Маскируем номер карты с добавлением типа карты
-    # Маскируем номер счета с добавлением слова "Счет"
-    card_types = ["Visa Classic", "Visa Gold", "Visa Platinum", "Maestro", "MasterCard"]
+    card_types = ["МИР", "Visa Classic", "Visa Gold", "Visa Platinum", "Visa", "Maestro", "MasterCard", "Discover", "American Express"]
     for card_type in card_types:
-        if card_type in card_info:
+        if card_type.lower() in card_info.lower():
             card_number = card_info.split()[-1]
-            return f"{card_type} {get_mask_card_number(int(card_number))}"
+            return f"{card_type} {get_mask_card_number(str(card_number))}"
+
+    # Проверка на наличие слова "Счет"
     if "Счет" in card_info:
         account_number = card_info.split()[-1]
-        return f"{card_info.split()[0]} {get_mask_account(int(account_number))}"
-    else:
-        # raise ValueError("Неизвестный тип карты")
-        return "Неизвестный тип карты"
+        return f"{card_info.split()[0]} {get_mask_account(str(account_number))}"
+
+    return "Неизвестный тип карты или данные отсутствуют"
 
 
 def get_date(date_str: Union[str]) -> Union[str]:
     """
     Конвертирует строку с датой в формат "ДД.ММ.ГГГГ"
-    Вход: "2024-03-11T02:26:18.671407"
+    Вход: "2024-03-11T02:26:18.671407Z"
     Выход: "11.03.2024"
     """
     error_message = "Введен некорректный или нестандартный формат даты"
@@ -35,29 +37,34 @@ def get_date(date_str: Union[str]) -> Union[str]:
     if not date_str:
         return error_message
 
+    # Удаляем 'Z' в конце строки, если он присутствует
+    if date_str.endswith('Z'):
+        date_str = date_str[:-1]
+
     parts = date_str.split("T")
     if len(parts) != 2:
         return error_message
 
     date_parts = parts[0].split("-")
     time_parts = parts[1].split(":")
+
+    # Учитываем, что время может содержать миллисекунды
     seconds_parts = time_parts[2].split(".")
 
-    if len(date_parts) != 3 or len(time_parts) != 3 or len(seconds_parts) != 2:
+    if len(date_parts) != 3 or len(time_parts) < 3 or len(seconds_parts) < 1:
         return error_message
 
     year, month, day = date_parts
-    hours, minutes, seconds = time_parts[0], time_parts[1], seconds_parts[0]
-    microseconds = seconds_parts[1]
+    hours, minutes = time_parts[0], time_parts[1]
+    seconds = seconds_parts[0]  # Берем только секунды, игнорируем миллисекунды
 
     if (
-        not (year.isdigit() and 1900 <= int(year) <= 2100)
-        or not (month.isdigit() and 1 <= int(month) <= 12)
-        or not (day.isdigit() and 1 <= int(day) <= 31)
-        or not (hours.isdigit() and 0 <= int(hours) <= 23)
-        or not (minutes.isdigit() and 0 <= int(minutes) <= 59)
-        or not (seconds.isdigit() and 0 <= int(seconds) <= 59)
-        or not (microseconds.isdigit() and 0 <= int(microseconds) <= 999999)
+            not (year.isdigit() and 1900 <= int(year) <= 2100)
+            or not (month.isdigit() and 1 <= int(month) <= 12)
+            or not (day.isdigit() and 1 <= int(day) <= 31)
+            or not (hours.isdigit() and 0 <= int(hours) <= 23)
+            or not (minutes.isdigit() and 0 <= int(minutes) <= 59)
+            or not (seconds.isdigit() and 0 <= int(seconds) <= 59)
     ):
         return error_message
 
