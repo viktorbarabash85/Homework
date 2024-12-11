@@ -1,10 +1,11 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Hashable, List, Optional
+
 import pandas as pd
 
 
 def read_transactions_from_csv(
-        file_path: str, nrows: Optional[int] = None, delimiter: str = ","
-) -> List[Dict[str, Any]]:
+    file_path: str, nrows: Optional[int] = None, delimiter: str = ","
+) -> List[dict[Hashable, Any]]:
     """
     Чтение транзакций из CSV файла.
 
@@ -30,7 +31,7 @@ def read_transactions_from_csv(
         raise Exception(f"Ошибка при чтении CSV файла: {str(e)}")
 
 
-def read_transactions_from_excel(file_path: str, nrows: Optional[int] = None) -> List[Dict[str, Any]]:
+def read_transactions_from_excel(file_path: str, nrows: Optional[int] = None) -> List[dict[Hashable, Any]]:
     """
     Чтение транзакций из Excel файла.
 

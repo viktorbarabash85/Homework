@@ -1,5 +1,5 @@
 import unittest
-from typing import Any, Dict, List
+from typing import Any, Dict, Hashable, List
 from unittest.mock import patch
 
 import pandas as pd
@@ -31,7 +31,7 @@ class TestFinanceReader(unittest.TestCase):
                 "description": ["Перевод организации"],
             }
         )
-        result: List[Dict[str, Any]] = read_transactions_from_csv("fake_path.csv")
+        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv")
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -70,7 +70,7 @@ class TestFinanceReader(unittest.TestCase):
         )
 
         # Чтение только одной строки
-        result: List[Dict[str, Any]] = read_transactions_from_csv("fake_path.csv", nrows=1)
+        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv", nrows=1)
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -107,7 +107,7 @@ class TestFinanceReader(unittest.TestCase):
                 "description": ["Перевод организации"],
             }
         )
-        result: List[Dict[str, Any]] = read_transactions_from_excel("fake_path.xlsx")
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx")
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -146,7 +146,7 @@ class TestFinanceReader(unittest.TestCase):
         )
 
         # Чтение только одной строки
-        result: List[Dict[str, Any]] = read_transactions_from_excel("fake_path.xlsx", nrows=1)
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx", nrows=1)
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -173,7 +173,7 @@ class TestFinanceReader(unittest.TestCase):
             columns=["id", "state", "date", "amount", "currency_name", "currency_code", "from", "to", "description"]
         )
 
-        result: List[Dict[str, Any]] = read_transactions_from_csv("fake_path.csv")
+        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv")
         self.assertEqual(result, [])  # Проверяем, что возвращается пустой список
 
     @patch("pandas.read_excel")
@@ -187,7 +187,7 @@ class TestFinanceReader(unittest.TestCase):
             columns=["id", "state", "date", "amount", "currency_name", "currency_code", "from", "to", "description"]
         )
 
-        result: List[Dict[str, Any]] = read_transactions_from_excel("fake_path.xlsx")
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx")
         self.assertEqual(result, [])  # Проверяем, что возвращается пустой список
 
     @patch("pandas.read_csv")

@@ -1,9 +1,11 @@
-from typing import Union
+from typing import Any, Union
+
 from src.masks import get_mask_account, get_mask_card_number
+
 # import datetime
 
 
-def mask_account_card(card_info: Union[str, float]) -> Union[str]:
+def mask_account_card(card_info: dict | str) -> Any:
     """
     Маскирует информацию о карте или счете с применением функций из masks.py
     """
@@ -12,7 +14,17 @@ def mask_account_card(card_info: Union[str, float]) -> Union[str]:
         return "Неизвестный тип карты или данные отсутствуют"
 
     # Маскируем номер карты с добавлением типа карты
-    card_types = ["МИР", "Visa Classic", "Visa Gold", "Visa Platinum", "Visa", "Maestro", "MasterCard", "Discover", "American Express"]
+    card_types = [
+        "МИР",
+        "Visa Classic",
+        "Visa Gold",
+        "Visa Platinum",
+        "Visa",
+        "Maestro",
+        "MasterCard",
+        "Discover",
+        "American Express",
+    ]
     for card_type in card_types:
         if card_type.lower() in card_info.lower():
             card_number = card_info.split()[-1]
@@ -26,7 +38,7 @@ def mask_account_card(card_info: Union[str, float]) -> Union[str]:
     return "Неизвестный тип карты или данные отсутствуют"
 
 
-def get_date(date_str: Union[str]) -> Union[str]:
+def get_date(date_str: Union[str]) -> Any:
     """
     Конвертирует строку с датой в формат "ДД.ММ.ГГГГ"
     Вход: "2024-03-11T02:26:18.671407Z"
@@ -38,7 +50,7 @@ def get_date(date_str: Union[str]) -> Union[str]:
         return error_message
 
     # Удаляем 'Z' в конце строки, если он присутствует
-    if date_str.endswith('Z'):
+    if date_str.endswith("Z"):
         date_str = date_str[:-1]
 
     parts = date_str.split("T")
@@ -59,12 +71,12 @@ def get_date(date_str: Union[str]) -> Union[str]:
     seconds = seconds_parts[0]  # Берем только секунды, игнорируем миллисекунды
 
     if (
-            not (year.isdigit() and 1900 <= int(year) <= 2100)
-            or not (month.isdigit() and 1 <= int(month) <= 12)
-            or not (day.isdigit() and 1 <= int(day) <= 31)
-            or not (hours.isdigit() and 0 <= int(hours) <= 23)
-            or not (minutes.isdigit() and 0 <= int(minutes) <= 59)
-            or not (seconds.isdigit() and 0 <= int(seconds) <= 59)
+        not (year.isdigit() and 1900 <= int(year) <= 2100)
+        or not (month.isdigit() and 1 <= int(month) <= 12)
+        or not (day.isdigit() and 1 <= int(day) <= 31)
+        or not (hours.isdigit() and 0 <= int(hours) <= 23)
+        or not (minutes.isdigit() and 0 <= int(minutes) <= 59)
+        or not (seconds.isdigit() and 0 <= int(seconds) <= 59)
     ):
         return error_message
 

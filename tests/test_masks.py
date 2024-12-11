@@ -1,10 +1,48 @@
 import unittest
-from typing import Any, Dict, List
+from typing import Any, Dict, Hashable, List
 from unittest.mock import patch
 
 import pandas as pd
 
 from src.finance_reader import read_transactions_from_csv, read_transactions_from_excel
+from src.masks import get_mask_card_number, get_mask_account
+
+
+def test_get_mask_card_number_correct(card_number_correct: str) -> None:
+    """
+    Тестирование корректности маскирования информации о карте или счете.
+
+    :param: Ожидаемый результат маскирования корректно введенного номера карты.
+    """
+    assert get_mask_card_number("7000792289606361") == card_number_correct
+
+
+def test_get_mask_card_number_incorrect(card_number_incorrect: str) -> None:
+    """
+    Тестирование некорректности маскирования информации о карте или счете.
+
+    :param: Ожидаемый результат маскирования некорректно введенного номера карты.
+    """
+    assert get_mask_card_number("7000792289606361444") == card_number_incorrect
+
+
+def test_get_mask_account_correct(account_number_correct: str) -> None:
+    """
+    Тестирование корректности маскирования информации о карте или счете.
+
+    :param: Ожидаемый результат маскирования корректно введенного номера счета.
+    """
+    assert get_mask_account("73654108430135874305") == account_number_correct
+
+
+def test_get_mask_account_incorrect(account_number_incorrect: str) -> None:
+    """
+    Тестирование некорректности маскирования информации о карте или счете.
+
+    :param: Ожидаемый результат маскирования некорректно введенного номера счета.
+    """
+    assert get_mask_account("73654108430135874305332222") == account_number_incorrect
+
 
 
 class TestFinanceReader(unittest.TestCase):
@@ -30,7 +68,7 @@ class TestFinanceReader(unittest.TestCase):
                 "description": ["Перевод организации"],
             }
         )
-        result: List[Dict[str, Any]] = read_transactions_from_csv("fake_path.csv")
+        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv")
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -67,7 +105,7 @@ class TestFinanceReader(unittest.TestCase):
             }
         )
 
-        result: List[Dict[str, Any]] = read_transactions_from_csv("fake_path.csv", nrows=1)
+        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv", nrows=1)
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -103,7 +141,7 @@ class TestFinanceReader(unittest.TestCase):
                 "description": ["Перевод организации"],
             }
         )
-        result: List[Dict[str, Any]] = read_transactions_from_excel("fake_path.xlsx")
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx")
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -140,7 +178,7 @@ class TestFinanceReader(unittest.TestCase):
             }
         )
 
-        result: List[Dict[str, Any]] = read_transactions_from_excel("fake_path.xlsx", nrows=1)
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx", nrows=1)
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -167,7 +205,7 @@ class TestFinanceReader(unittest.TestCase):
             columns=["id", "state", "date", "amount", "currency_name", "currency_code", "from", "to", "description"]
         )
 
-        result: List[Dict[str, Any]] = read_transactions_from_csv("fake_path.csv")
+        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv")
         self.assertEqual(result, [])  # Проверяем, что возвращается пустой список
 
     @patch("pandas.read_excel")
@@ -181,7 +219,7 @@ class TestFinanceReader(unittest.TestCase):
             columns=["id", "state", "date", "amount", "currency_name", "currency_code", "from", "to", "description"]
         )
 
-        result: List[Dict[str, Any]] = read_transactions_from_excel("fake_path.xlsx")
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx")
         self.assertEqual(result, [])  # Проверяем, что возвращается пустой список
 
     @patch("pandas.read_csv")

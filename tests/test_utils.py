@@ -1,7 +1,7 @@
 import json
 import unittest
-from unittest.mock import MagicMock, mock_open, patch
 from typing import Any, List
+from unittest.mock import MagicMock, mock_open, patch
 
 from src.utils import read_json_file
 

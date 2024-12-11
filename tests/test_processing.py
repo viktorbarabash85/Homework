@@ -88,8 +88,8 @@ def test_filter_without_state_correct(filter_without_state_correct: list[dict[st
             ],
             "INVALID_STATE",
             "Информация отсутствует или некорректно введен запрашиваемый статус",
-        )
-    ]
+        ),
+    ],
 )
 def test_filter_by_state(transactions: list, state: str, expected: list) -> None:
     """
@@ -102,7 +102,7 @@ def test_filter_by_state(transactions: list, state: str, expected: list) -> None
     assert filter_by_state(transactions, state) == expected
 
 
-def test_sort_by_date_true(sort_by_date_true_correct: list[dict[str, str]]) -> None:
+def test_sort_by_date_true(sort_by_date_true_correct: list) -> None:
     """
     Тестирование сортировки списка словарей по датам в порядке убывания
     (по умолчанию — убывание: True).
@@ -178,7 +178,7 @@ def test_sort_by_date_incorrect(sort_by_date_incorrect: list[dict[str, str]]) ->
                 {"id": 939719570, "state": "EXECUTED", "date": "2018-10-14T08:21:33.111111"},
                 {"id": 41428829, "state": "EXECUTED", "date": "2018-10-14T08:21:33.222222"},
                 {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.333333"},
-                {"id": 594226727, "state": "CANCELED", "date": "2018-10-14T08:21:33.444444"}
+                {"id": 594226727, "state": "CANCELED", "date": "2018-10-14T08:21:33.444444"},
             ],
         ),
         (
