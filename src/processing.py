@@ -1,40 +1,39 @@
-from typing import Union
+from datetime import datetime
 
 from src.widget import get_date
 
 
-def filter_by_state(transactions: list, state: str = "EXECUTED") -> Union[list, str]:
+def filter_by_state(transactions: list[dict], state: str = "EXECUTED") -> list[dict]:
     """
     Функция фильтрует список словарей по значению ключа state.
-    Вход:
-    transactions (list): Список словарей с данными о банковских операциях.
-    state (str, optional): Значение для ключа state (по умолчанию 'EXECUTED').
-    Выход:
-    list: Новый список словарей, содержащий только те словари, у которых ключ state соответствует указанному значению.
+
+    :param transactions: Список словарей с данными о банковских операциях.
+    :param state: (str, optional) Значение для ключа state (по умолчанию 'EXECUTED').
+    :return list[dict]: Список словарей, у которых ключ state соответствует указанному значению.
+    Исключения:
+    ValueError: Если state не является одним из допустимых значений.
     """
-    filtered_transactions = []
-    for transaction in transactions:
-        if transaction["state"] == state:
-            filtered_transactions.append(transaction)
-    if not filtered_transactions:
-        return "Информация отсутствует или некорректно введен запрашиваемый статус"
-    else:
-        return filtered_transactions
+    valid_states = ("EXECUTED", "CANCELED", "PENDING")
+    if state not in valid_states:
+        raise ValueError(f'Ошибка. Статус "{state}" введен некорректно. Допустимые статусы {valid_states}')
+    return [transaction for transaction in transactions if transaction.get("state") == state]
 
 
-def sort_by_date(transactions: list, reverse: bool = True) -> Union[list, str]:
+def sort_by_date(transactions: list[dict], reverse: bool = True) -> list[dict]:
     """
-    Функция сортирует список словарей по дате.
-    Вход:
-    transactions (list): Список словарей с данными о банковских операциях.
-    reverse (bool, optional): Параметр, задающий порядок сортировки (по умолчанию True).
-    Выход:
-    list: Новый список словарей, отсортированный по дате.
+    Сортирует список транзакций по дате.
+
+    :param transactions: список транзакций
+    :param reverse: если True, сортирует по убыванию
+    :return: отсортированный список транзакций или сообщение об ошибке
     """
-    valid_transactions = []
+
     for transaction in transactions:
-        date_str = get_date(transaction["date"])
+
+        # Проверка формата даты функцией get_date из модуля widget.py
+        date_str = get_date(str(transaction["date"]))
         if date_str.startswith("Введен некорректный или нестандартный формат даты"):
-            return date_str
-        valid_transactions.append(transaction)
-    return sorted(valid_transactions, key=lambda x: x["date"], reverse=reverse)
+            raise ValueError("Введен некорректный или нестандартный формат даты")
+
+    # Сортируем транзакции по дате
+    return sorted(transactions, key=lambda x: datetime.fromisoformat(x["date"][:-1]), reverse=reverse)

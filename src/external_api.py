@@ -10,7 +10,12 @@ API_URL = "https://apilayer.com/exchangerates_data/convert?to={to}&from={from_}&
 
 
 def api_convert_currency(transaction: dict) -> float:
-    """Конвертирует сумму транзакции в рубли через API."""
+    """
+    Конвертирует сумму транзакции в рубли через API.
+
+    :param transaction: Словарь, представляющий транзакцию, содержащий информацию о сумме и валюте.
+    :return: Конвертированная сумма в рублях. Возвращает 0.0 в случае ошибки или если валюта не поддерживается.
+    """
     amount = transaction.get("operationAmount", {}).get("amount", 0.0)  # Default to 0.0
     currency = transaction.get("operationAmount", {}).get("currency", {}).get("code", "")  # Default to empty string
 

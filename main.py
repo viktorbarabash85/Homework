@@ -1,176 +1,201 @@
-"""
-Импорты активируются при распаковке запуска функции homwork_12_1 (:140)
-"""
-
 import os
 
-from src.decorators import log
-from src.external_api import api_convert_currency
+import pandas as pd
+
 from src.finance_reader import read_transactions_from_csv, read_transactions_from_excel
-from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
-from src.masks import get_mask_account, get_mask_card_number
+from src.generators import filter_by_currency
 from src.processing import filter_by_state, sort_by_date
+from src.search_and_count import count_operations_by_category, search_operations_by_description
 from src.utils import read_json_file
 from src.widget import get_date, mask_account_card
 
-# homwork_11_1
-# Словарь для проверки функций filter_by_currency и transaction_descriptions
-transactions = [
-    {
-        "id": 939719570,
-        "state": "EXECUTED",
-        "date": "2018-06-30T02:08:58.425572",
-        "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
-        "description": "Перевод организации",
-        "from": "Счет 75106830613657916952",
-        "to": "Счет 11776614605963066702",
-    },
-    {
-        "id": 142264268,
-        "state": "EXECUTED",
-        "date": "2019-04-04T23:20:05.206878",
-        "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
-        "description": "Перевод со счета на счет",
-        "from": "Счет 19708645243227258542",
-        "to": "Счет 75651667383060284188",
-    },
-    {
-        "id": 873106923,
-        "state": "EXECUTED",
-        "date": "2019-03-23T01:09:46.296404",
-        "operationAmount": {"amount": "43318.34", "currency": {"name": "руб.", "code": "RUB"}},
-        "description": "Перевод со счета на счет",
-        "from": "Счет 44812258784861134719",
-        "to": "Счет 74489636417521191160",
-    },
-    {
-        "id": 895315941,
-        "state": "EXECUTED",
-        "date": "2018-08-19T04:27:37.904916",
-        "operationAmount": {"amount": "56883.54", "currency": {"name": "USD", "code": "USD"}},
-        "description": "Перевод с карты на карту",
-        "from": "Visa Classic 6831982476737658",
-        "to": "Visa Platinum 8990922113665229",
-    },
-    {
-        "id": 594226727,
-        "state": "CANCELED",
-        "date": "2018-09-12T21:27:25.241689",
-        "operationAmount": {"amount": "67314.70", "currency": {"name": "руб.", "code": "RUB"}},
-        "description": "Перевод организации",
-        "from": "Visa Platinum 1246377376343588",
-        "to": "Счет 14211924144426031657",
-    },
-]
 
-print("_" * 13)  # для разделения
-print("Маскирует номер банковской карты")
-print(get_mask_card_number(7000792289606361))
-print("_" * 13)  # для разделения
+def main() -> None:
+    """
+    Программа по работе с банковскими транзакциями.
+    """
 
-print("Маскирует номер банковского счета")
-print(get_mask_account(73654108430135874305))
-print("_" * 13)  # для разделения
+    print(f"{"_" * 40}\nПривет! Добро пожаловать в программу работы с банковскими транзакциями.")
 
-print("Маскирует информацию о карте или счете с применением функций из masks.py")
-print(mask_account_card("Visa Platinum 7000792289606361"))
-print("_" * 13)  # для разделения
+    transactions: list[dict] = []
+    sorted_transactions: list[dict] = []
 
-print("Конвертирует строку с датой в формат 'ДД.ММ.ГГГГ'")
-print(get_date("2024-03-11T02:26:18.671407"))
-print("_" * 13)  # для разделения
+    # Шаг 1: Выбор файла
+    while not transactions:
+        print("\nВыберите необходимый пункт меню:")
+        print("1. Получить информацию о транзакциях из JSON-файла")
+        print("2. Получить информацию о транзакциях из CSV-файла")
+        print("3. Получить информацию о транзакциях из XLSX-файла")
 
-print("Функция фильтрует список словарей по значению ключа state.")
-print(
-    filter_by_state(
-        [
-            {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-            {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-            {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-            {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-        ],
-        "CANCELED",
-    )
-)
-print("_" * 13)  # для разделения
+        choice = input(">>> ").strip().lower()
 
-print("Функция сортирует список словарей по дате.")
-print(
-    sort_by_date(
-        [
-            {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-            {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-            {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-            {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-        ]
-    )
-)
-print("_" * 13)  # для разделения
+        if choice == "1":
+            transactions = read_json_file(os.path.join("data", "operations.json"))
+            print("\nДля обработки выбран JSON-файл.")
+        elif choice == "2":
+            transactions = read_transactions_from_csv(os.path.join("data", "transactions.csv"), delimiter=";")
+            print("\nДля обработки выбран CSV-файл.")
+        elif choice == "3":
+            transactions = read_transactions_from_excel(os.path.join("data", "transactions_excel.xlsx"))
+            print("\nДля обработки выбран XLSX-файл.")
+        else:
+            print("Некорректный выбор. Пожалуйста, выберите один из предложенных пунктов.")
 
-print("Функция принимает на список словарей, представляющих транзакции")
-print("Возвращает итератор, который поочередно выдает транзакции,")
-usd_transactions = filter_by_currency(transactions, "USD")
-for _ in range(2):
-    print(next(usd_transactions))
-print("_" * 13)  # для разделения
+    # Преобразование транзакций
+    transactions = [
+        {
+            "id": t.get("id"),
+            "state": t.get("state"),
+            "date": t.get("date"),
+            "operationAmount": {
+                "amount": str(t.get("operationAmount", {}).get("amount", t.get("amount", ""))),
+                "currency": {
+                    "name": t.get("operationAmount", {}).get("currency", {}).get("name", t.get("currency_name", "")),
+                    "code": t.get("operationAmount", {}).get("currency", {}).get("code", t.get("currency_code", "")),
+                },
+            },
+            "description": t.get("description"),
+            "from": t.get("from") if t.get("from") else "",
+            "to": t.get("to") if t.get("to") else "",
+        }
+        for t in transactions
+    ]
 
-print("Генератор принимает список словарей с транзакциями")
-print("Возвращает описание каждой операции по очереди.")
-descriptions = transaction_descriptions(transactions)
-for _ in range(5):
-    print(next(descriptions))
-print("_" * 13)  # для разделения
+    # Шаг 2: Фильтрация по статусу
+    valid_states = ["EXECUTED", "CANCELED", "PENDING"]
+    while True:
+        print("\nВведите статус, по которому необходимо выполнить фильтрацию.")
+        print(f"Доступные для фильтровки статусы: {', '.join(valid_states)}")
 
-print("Генератор выдает номера банковских карт в формате XXXX XXXX XXXX XXXX.")
-print("Принимает начальное и конечное значения для генерации диапазона номеров.")
-for card_number in card_number_generator(1, 5):
-    print(card_number)
-print("_" * 13)  # для разделения
+        state = input(">>> ").strip().upper()
+
+        if state not in valid_states:
+            print(f"Статус операции {state} недоступен. Введите один из доступных статусов.")
+            continue
+        else:
+            break
+
+    filtered_transactions = filter_by_state(transactions, state)
+    print(f'\nОперации отфильтрованы по статусу "{state}"')
+
+    # Шаг 3: Сортировка по дате
+    if filtered_transactions:
+        while True:
+            print("\nОтсортировать операции по дате? Да/Нет")
+
+            sort_choice = input(">>> ").strip().lower()
+
+            if sort_choice == "да":
+                while True:
+                    print("\nОтсортировать по возрастанию или по убыванию?")
+
+                    order = input(">>> ").strip().lower()  # ввод пользователя
+
+                    if order == "по убыванию":
+                        reverse = True
+                        sorted_transactions = sort_by_date(filtered_transactions, reverse)
+                        break
+                    elif order == "по возрастанию":
+                        reverse = False
+                        sorted_transactions = sort_by_date(filtered_transactions, reverse)
+                        break
+                    else:
+                        print("Некорректный ввод. Пожалуйста, выберите 'по возрастанию' или 'по убыванию'.")
+                break
+
+            elif sort_choice == "нет":
+                sorted_transactions = filtered_transactions
+                break
+
+            else:
+                print("Введен некорректный ответ. Пожалуйста, ответьте 'Да' или 'Нет'.")
+
+    # Шаг 4: Фильтрация по валюте
+    while True:
+        print("\nВыводить только рублевые транзакции? Да/Нет")
+
+        currency_choice = input(">>> ").strip().lower()
+
+        if currency_choice == "да":
+            sorted_transactions = list(filter_by_currency(sorted_transactions, "RUB"))
+            break
+        elif currency_choice == "нет":
+            sorted_transactions = filtered_transactions
+            break
+        else:
+            print("Введен некорректный ответ. Пожалуйста, ответьте 'Да' или 'Нет'.")
+
+    # Шаг 5: Фильтрация по описанию
+    search_term = ""
+    while True:
+        print("\nОтфильтровать список транзакций по определенному слову в описании? Да/Нет")
+
+        description_filter = input(">>> ").strip().lower()
+
+        if description_filter == "да":
+            while True:
+                print("\nВведите слово для поиска интересующих транзакций:")
+                print("(например: перевод, открытие, закрытие, вклад, счет, организации и т.д.):")
+
+                search_term = input(">>> ").strip().lower()
+
+                if not search_term:
+                    print("Необходимо ввести слово для поиска.")
+                    continue
+
+                filtered_transactions = search_operations_by_description(sorted_transactions, search_term)
+
+                categories = list(set(t["description"] for t in filtered_transactions))
+                count = count_operations_by_category(filtered_transactions, categories)
+                sorted_transactions = filtered_transactions
+                break
+            break
+
+        elif description_filter == "нет":
+            filtered_transactions = sorted_transactions
+            categories = list(set(t["description"] for t in filtered_transactions))
+            count = count_operations_by_category(filtered_transactions, categories)
+            break
+        else:
+            print("Введен некорректный ответ. Пожалуйста, ответьте 'Да' или 'Нет'.")
+
+    # Шаг 6: Итоговый вывод
+    print(f"{"_" * 40}\nРаспечатываю итоговый список транзакций...\n{"_" * 40}")
+
+    if filtered_transactions:
+        print(f"\nВсего банковских операций в выборке: {len(filtered_transactions)}")
+
+        if "count" in locals():
+            print("\nНайдены следующие транзакции:")
+            for category, category_count in count.items():
+                print(f"{category}: {category_count}")
+
+        print(f"{"_" * 40}\n")
+
+        # Вывод информации о каждой транзакции
+        for t in filtered_transactions:
+            try:
+                date = get_date(t["date"])
+                amount = t["operationAmount"]["amount"]
+                currency = t["operationAmount"]["currency"]["code"]
+                masked_from = mask_account_card(str(t["from"])) if pd.notna(t["from"]) else ""
+                masked_to = mask_account_card(str(t["to"])) if pd.notna(t["to"]) else ""
+                description = t["description"]
+
+                print(f"{date} {description}")
+                if masked_from:  # Проверяем, есть ли значение masked_from
+                    print(f"{masked_from} -> {masked_to}")
+                else:
+                    print(masked_to)
+                print(f"Сумма: {amount} {currency}\n")
+
+            except KeyError as e:
+                print(f"Ошибка: отсутствует ключ {e} в транзакции: {t}\n")
+            except Exception as e:
+                print(f"Неизвестная ошибка при обработке транзакции: {e}\n")
+    else:
+        print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
 
 
-@log(filename="mylog.txt")
-def my_function(x: int, y: int) -> int:
-    return x + y
-
-
-my_function(1, 2)
-print("_" * 13)  # для разделения
-
-"""
-homwork_12_1. Считывание транзакций по API. Длязапуска раскомменетируйте строки кода
-"""
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# file_path = os.path.join(current_dir, "data", "operations.json")
-# transactions_json = read_json_file(file_path)
-#
-# for transaction in transactions_json:
-#     rub_amount = api_convert_currency(transaction)
-#     print(f"Transaction amount in RUB: {rub_amount}")
-
-print("_" * 13)  # для разделения
-
-
-"""
-homwork_13_1 считывание финансовых операций из CSV- и XLSX-файлов
-"""
-print("homwork_13_1 считывание финансовых операций из CSV- и XLSX-файлов\n")
-csv_file_path = "data/transactions.csv"
-excel_file_path = "data/transactions_excel.xlsx"
-
-print(f"Чтение транзакций из CSV файла ({csv_file_path})\n")
-# Укажите значение nrows для количества вывода строк. Без значения выведет все строки
-print(read_transactions_from_csv(csv_file_path, nrows=2))
-print(f"\nВыведено из CSV файла ({csv_file_path}):")
-print(
-    f"\nОбщее количество транзакций из CSV файла ({csv_file_path}): {len(read_transactions_from_csv(csv_file_path))}"
-)
-print("_" * 13)  # для разделения
-
-print(f"Чтение транзакций из Excel файла ({excel_file_path})\n")
-# Укажите значение nrows для количества вывода строк. Без значения выведет все строки
-print(read_transactions_from_excel(excel_file_path, nrows=2))
-print(
-    f"\nОбщее количество транзакций из Excel файла ({excel_file_path}): "
-    f"{len(read_transactions_from_excel(excel_file_path))}"
-)
-print("_" * 13)  # для разделения
+if __name__ == "__main__":
+    main()
