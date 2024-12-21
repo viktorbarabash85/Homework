@@ -45,14 +45,13 @@ ___
 
 ## Описание проекта [⮭](#содержание)
 
-Проект "homework_13_2" является заврешающей работой над виджетом банковских операций клиента, 
+Проект "homework_13_2" реализованный в модуле `main.py` является заврешающей работой над виджетом банковских операций клиента, 
 с применением функционала, который уже был реализован в предыдущих проектах:
 
 `homework_9_1`, `homework_9_2`, `homework_10_1`, `homework_10_2`, `homework_11_1`, `homework_11_2`, `homework_12_1`, 
 `homework_12_2`, `homework_13_1`. 
 
-В качестве входных данных для многих функций теперь можно использовать данные, полученные не только из JSON-файла, 
-но и CSV- или XLSX-файлов.
+В качестве входных данных для многих функций используются данные, полученные из JSON-файла, CSV- и XLSX-файлов.
 
 
 <details><summary>**program preview**
@@ -143,7 +142,7 @@ ___
 
 Тесты написаны ко всем функциям проекта в модулях: `test_masks.py`, `test_widjet.py`, `test_processing.py`,
 `test_generators.py`, `test_decorators.py`, `conftest.py`, `test_external_api.py`, `test_utils.py`, 
-`test_finance_reader.py`, `search_operations_by_description`, `count_operations_by_category`.  
+`test_finance_reader.py`, `test_search_operations_by_description`, `test_count_operations_by_category` и `test_main.py`.  
 
 Все тесты расположены в папке `tests\`.
 
@@ -683,7 +682,7 @@ ___
 **:return:** Список словарей из категорий, у которых в описании есть введенное слово или строка.
 
 ```bash
-# нвходой аргумент
+# входой аргумент
 search_operations_by_description(
     [
         {"description": "Перевод с карты на карту"},
