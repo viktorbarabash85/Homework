@@ -8,8 +8,8 @@ from typing import Any, Callable, Optional
 def log(filename: Optional[str] = None) -> Callable:
     """Декоратор, который будет логировать вызов функции и ее результат в файл или в консоль.
 
-    :param filename: имя файла для записи логов. Если None, лог выводится в консоль.
-    :return: обернутая функция, которая логирует свои вызовы и результаты.
+    :param filename: Имя файла для записи логов. Если None, лог выводится в консоль.
+    :return: Обернутая функция, которая логирует свои вызовы и результаты.
     """
 
     def wrapper(func: Callable) -> Callable:
@@ -28,7 +28,7 @@ def log(filename: Optional[str] = None) -> Callable:
                 if filename:  # Запись лога в файл.
                     if not os.path.exists(r"logs"):
                         os.mkdir(r"logs")  # Создать папку «logs», если ее нет.
-                    with open(os.path.join(r"logs", filename), "at") as file:
+                    with open(os.path.join(r"logs", filename), "at", encoding="utf-8") as file:
                         file.write(log_str + "\n")
                 else:  # Вывод лога в консоль.
                     print(log_str)

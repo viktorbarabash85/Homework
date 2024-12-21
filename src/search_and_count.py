@@ -1,21 +1,14 @@
 import re
 from collections import Counter
-from typing import Any, Dict, List, Union
 
 
-def search_operations_by_description(
-    operations: List[Dict[str, Any]], search_term: str
-) -> Union[str, List[Dict[str, Any]]]:
+def search_operations_by_description(operations: list[dict], search_term: str) -> list[dict]:
     """
     Функция для поиска операций по описанию с использованием регулярных выражений.
     :param operations: Список словарей с данными о банковских операциях.
     :param search_term: Строка для поиска в описании операций.
     :return: Список словарей из категорий, у которых в описании есть введенное слово или строка.
     """
-
-    # Проверка на пустую строку
-    search_term = search_term.lower()
-    results = []
 
     sample_patterns = [
         r"перевод",
@@ -26,12 +19,20 @@ def search_operations_by_description(
         r"организаци\w*",  # "организации" с возможным окончанием
     ]
 
-    if not search_term:
-        return "Необходимо ввести слово для поиска."
+    # Проверка на пустую строку
+    if search_term == "":
+        # raise TypeError("Необходимо ввести слово для поиска.")
+        return []
+
+    search_term = search_term.lower()
+    results = []
 
     # Обходим все операции
-    for operation in operations:
-        description = operation.get("description", "").lower()  # Получаем описание и приводим к нижнему регистру
+    for operation in operations:  # Получаем описание и приводим к нижнему регистру
+        description = operation.get("description")
+        if description is None:
+            continue
+        description = description.lower()
 
         # Проверяем, есть ли совпадение с введенным словом
         if any(re.search(pattern, search_term) for pattern in sample_patterns) or search_term in description:
@@ -41,27 +42,22 @@ def search_operations_by_description(
     return results
 
 
-def count_operations_by_category(operations: list[Any], category_count: dict) -> dict:
+def count_operations_by_category(transactions: list[dict], categories: list[str]) -> dict[str, int]:
     """
-    Функция для подсчета количества операций по категориям.
+    Функция для подсчета количества операций определенного типа.
 
-    :param operations: Список словарей с данными о банковских операциях.
-    :param category_count: Словарь для подсчета транзакций по описанию (по умолчанию пустой словарь).
+    :param transactions: Список словарей с данными о банковских операциях.
+    :param categories: Список категорий для подсчета транзакций по описанию. По умолчанию None.
     :return: Словарь, где ключи — это названия категорий, а значения — количество операций в каждой категории.
     """
-    # Инициализация словаря для подсчета категорий, если он не передан
-    if category_count is None:
-        category_count = Counter()
 
-    # Обходим все операции
-    for operation in operations:
-        description = operation.get("description", "Описание отсутствует")  # Используем значение по умолчанию
+    # Извлекаем описания операций из транзакций
+    descriptions = [transaction["description"] for transaction in transactions]
 
-        # Проверяем, существует ли категория в словаре, если нет, инициализируем ее
-        if description not in category_count:
-            category_count[description] = 0
+    # Используем Counter для подсчета количества операций по описаниям
+    description_count = Counter(descriptions)
 
-        # Увеличиваем счетчик для данной категории
-        category_count[description] += 1
+    # Создаем словарь для хранения результатов по заданным категориям
+    category_count = {category: description_count.get(category, 0) for category in categories}
 
-    return dict(category_count)
+    return category_count

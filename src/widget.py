@@ -1,20 +1,20 @@
-from typing import Any, Union
-
 from src.masks import get_mask_account, get_mask_card_number
 
 # import datetime
 
 
-def mask_account_card(card_info: dict | str) -> Any:
+def mask_account_card(card_info: str) -> str:
     """
-    Маскирует информацию о карте или счете с применением функций из masks.py
-    """
-    # Проверка на пустое значение или неверный тип
-    if not isinstance(card_info, str) or card_info.strip() == "":
-        return "Неизвестный тип карты или данные отсутствуют"
+    Маскирует информацию о карте или счете с применением функций из masks.py.
 
-    # Маскируем номер карты с добавлением типа карты
-    card_types = [
+    :param card_info: строку, содержащую тип и номер карты или счета
+    :return: строку с замаскированным номером, перед которым указан "Тип карты" или "Счет"
+    """
+
+    if not card_info:  # Если card_info пустое, возвращаем пустую строку
+        return ""
+
+    card_types = (
         "МИР",
         "Visa Classic",
         "Visa Gold",
@@ -24,26 +24,34 @@ def mask_account_card(card_info: dict | str) -> Any:
         "MasterCard",
         "Discover",
         "American Express",
-    ]
+    )
+
+    # Разделяем строку на слова
+    words = card_info.split()
+
+    # Проверяем на наличие точного названия типа карты
     for card_type in card_types:
-        if card_type.lower() in card_info.lower():
-            card_number = card_info.split()[-1]
+        if card_type.lower() == " ".join(words[:-1]).lower():  # Сравниваем все слова, кроме последнего
+            card_number = words[-1]
             return f"{card_type} {get_mask_card_number(str(card_number))}"
 
     # Проверка на наличие слова "Счет"
-    if "Счет" in card_info:
-        account_number = card_info.split()[-1]
-        return f"{card_info.split()[0]} {get_mask_account(str(account_number))}"
+    if "счет" in card_info.lower():
+        account_number = words[-1]
+        return f"{words[0]} {get_mask_account(str(account_number))}"
 
-    return "Неизвестный тип карты или данные отсутствуют"
+    # Если ни одно из условий не выполнено, возвращаем пустую строку
+    return "Некорректно указан тип карты или счета"
 
 
-def get_date(date_str: Union[str]) -> Any:
+def get_date(date_str: str) -> str:
     """
     Конвертирует строку с датой в формат "ДД.ММ.ГГГГ"
-    Вход: "2024-03-11T02:26:18.671407Z"
-    Выход: "11.03.2024"
+
+    :param date_str: "2024-03-11T02:26:18.671407Z"
+    :return: "11.03.2024"
     """
+
     error_message = "Введен некорректный или нестандартный формат даты"
 
     if not date_str:

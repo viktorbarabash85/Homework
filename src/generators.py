@@ -1,24 +1,22 @@
 # Модуль generators содержит функции для работы с массивами транзакций
 
-from typing import Iterable, Iterator
+from typing import Iterator
 
 
-def filter_by_currency(transactions: Iterable[dict], currency_code: str) -> Iterator[dict]:
+def filter_by_currency(transactions: list[dict], currency_code: str) -> Iterator[dict]:
     """
-    Функция, которая принимает на вход список словарей, представляющих транзакции
-    и возвращает итератор, который поочередно выдает транзакции,
-    где валюта операции соответствует заданной (например, USD).
+    Функция, которая возвращает итератор отфильтрованных транзакций с поочередной выдачей по выбранной валюте.
+
+    :param transactions: Принимает список словарей, представляющих транзакции
+    :param currency_code: указывает тит валюты USD)
+    :return: возвращает итератор, который поочередно выдает транзакции по заданной валюте
     """
-    # for transaction in transactions:
-    #     if transaction["operationAmount"]["currency"]["code"] == currency_code:
-    #         yield transaction
     for transaction in transactions:
-        if isinstance(transaction, dict) and "operationAmount" in transaction:
-            if transaction["operationAmount"]["currency"]["code"] == currency_code:
-                yield transaction  # Возвращаем транзакцию, если она соответствует валюте
+        if transaction["operationAmount"]["currency"]["code"] == currency_code:
+            yield transaction  # Возвращаем транзакцию, если она соответствует валюте
 
 
-def transaction_descriptions(transactions: Iterable[dict]) -> Iterator[str]:
+def transaction_descriptions(transactions: list[dict]) -> Iterator[str]:
     """
     Генератор, который принимает список словарей с транзакциями
     и возвращает описание каждой операции по очереди.

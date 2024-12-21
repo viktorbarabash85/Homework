@@ -1,8 +1,6 @@
-"""
-Импорты активируются при распаковке запуска функции homwork_12_1 (:140)
-"""
-
+# Импорты активируются, при раскоментировании homwork_12_1 (строка 160)
 import os
+from datetime import datetime
 
 from src.decorators import log
 from src.external_api import api_convert_currency
@@ -10,13 +8,9 @@ from src.finance_reader import read_transactions_from_csv, read_transactions_fro
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.masks import get_mask_account, get_mask_card_number
 from src.processing import filter_by_state, sort_by_date
-from src.search_and_count import search_operations_by_description, count_operations_by_category
+from src.search_and_count import count_operations_by_category, search_operations_by_description
 from src.utils import read_json_file
-from src.widget import get_date
-
-from datetime import datetime
-from src.widget import mask_account_card
-
+from src.widget import get_date, mask_account_card
 
 # homwork_11_1
 # Словарь для проверки функций filter_by_currency и transaction_descriptions
@@ -68,6 +62,16 @@ transactions = [
     },
 ]
 
+# homwork_13_2
+# Список категорий банковских операций для подсчета
+categories = {
+    "Перевод организации",
+    "Перевод со счета на счет",
+    "Перевод с карты на карту",
+    "Открытие вклада",
+    "Закрытие вклада",
+}
+
 print("_" * 13)  # для разделения
 print("Маскирует номер банковской карты")
 print(get_mask_card_number(7000792289606361))
@@ -90,6 +94,7 @@ print(get_date("2024-03-11T02:26:18.671407"))
 print("_" * 13)  # для разделения
 
 print("Функция фильтрует список словарей по значению ключа state.")
+
 print(
     filter_by_state(
         [
@@ -98,7 +103,7 @@ print(
             {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
             {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
         ],
-        "CANCELED",
+        "PENDING",
     )
 )
 print("_" * 13)  # для разделения
@@ -111,14 +116,17 @@ print(
             {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
             {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
             {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-        ]
+        ],
+        False,
     )
 )
 print("_" * 13)  # для разделения
 
-print("Функция принимает на список словарей, представляющих транзакции")
-print("Возвращает итератор, который поочередно выдает транзакции,")
-usd_transactions = filter_by_currency(transactions, "USD")
+print("Функция принимает список словарей, представляющих транзакции")
+print("Возвращает итератор, который поочередно выдает транзакции по указанной валюте")
+currence_code = "USD"
+usd_transactions = filter_by_currency(transactions, currence_code)
+print(f"Выбрана валюта: {currence_code}\n")
 for _ in range(2):
     print(next(usd_transactions))
 print("_" * 13)  # для разделения
@@ -137,16 +145,17 @@ for card_number in card_number_generator(1, 5):
 print("_" * 13)  # для разделения
 
 
-@log(filename="mylog.txt")
+# @log(filename="mylog.txt")
+@log()  # пример для вывода лога в консоль
 def my_function(x: int, y: int) -> int:
     return x + y
 
 
-my_function(1, 2)
+my_function(1, 0)
 print("_" * 13)  # для разделения
 
 """
-homwork_12_1. Считывание транзакций по API. Длязапуска раскомменетируйте строки кода
+homwork_12_1. Считывание транзакций по API. Для запуска раскомменетируйте строки кода
 """
 # current_dir = os.path.dirname(os.path.abspath(__file__))
 # file_path = os.path.join(current_dir, "data", "operations.json")
@@ -158,78 +167,71 @@ homwork_12_1. Считывание транзакций по API. Длязапу
 
 print("_" * 13)  # для разделения
 
-
 """
 homwork_13_1 считывание финансовых операций из CSV- и XLSX-файлов
 """
 print("homwork_13_1 считывание финансовых операций из CSV- и XLSX-файлов\n")
 csv_file_path = "data/transactions.csv"
 excel_file_path = "data/transactions_excel.xlsx"
+nrows = 2  # Укажите значение nrows для количества вывода строк. Без значения (None)выведет все строки
 
 print(f"Чтение транзакций из CSV файла ({csv_file_path})\n")
-# Укажите значение nrows для количества вывода строк. Без значения выведет все строки
-print(read_transactions_from_csv(csv_file_path, nrows=2))
-print(f"\nВыведено из CSV файла ({csv_file_path}):")
 print(
-    f"\nОбщее количество транзакций из CSV файла ({csv_file_path}): {len(read_transactions_from_csv(csv_file_path))}"
+    f"Общее количество транзакций из CSV файла ({csv_file_path}): " f"{len(read_transactions_from_csv(csv_file_path))}"
 )
+print(f"Выводим из CSV файла: {nrows} транзакции.\n")
+print(read_transactions_from_csv(csv_file_path, nrows))
+
 print("_" * 13)  # для разделения
 
 print(f"Чтение транзакций из Excel файла ({excel_file_path})\n")
-# Укажите значение nrows для количества вывода строк. Без значения выведет все строки
-print(read_transactions_from_excel(excel_file_path, nrows=2))
 print(
-    f"\nОбщее количество транзакций из Excel файла ({excel_file_path}): "
+    f"Общее количество транзакций из Excel файла ({excel_file_path}): "
     f"{len(read_transactions_from_excel(excel_file_path))}"
 )
-print("_" * 13)  # для разделения
+print(f"Выводим из Excel файла: {nrows} транзакции.\n")
+print(read_transactions_from_excel(excel_file_path, nrows))
 
+print("_" * 13)  # для разделения
 
 """
 homwork_13_2 считывание финансовых операций из CSV- и XLSX-файлов
 """
-print("Фильтрует транзакции по слову \"перевод\"")
-print(search_operations_by_description(
-    [
-        {"description": "Перевод с карты на карту"},
-        {"description": "Перевод с карты на карту"},
-        {"description": "Перевод организации"},
-        {"description": "Перевод организации"},
-        {"description": "Перевод со счета на счет"},
-        {"description": "Закрытие вклада"},
-        {"description": "Открытие вклада"},
-        ], "перевод"))
+print('Фильтрует транзакции по слову "перевод"')
+print(
+    search_operations_by_description(
+        [
+            {"description": "Перевод с карты на карту"},
+            {"description": "Перевод с карты на карту"},
+            {"description": "Перевод организации"},
+            {"description": "Перевод организации"},
+            {"description": "Перевод со счета на счет"},
+            {"description": "Закрытие вклада"},
+            {"description": "Открытие вклада"},
+        ],
+        "перевод",
+    )
+)
 print("_" * 13)  # для разделения
 
 print("Реакция фильтрации при отсутствии слова для поиска")
-print(search_operations_by_description(
-    [
-        {"description": "Перевод с карты на карту"},
-        {"description": "Перевод с карты на карту"},
-        {"description": "Перевод организации"},
-        {"description": "Перевод организации"},
-        {"description": "Перевод со счета на счет"},
-        {"description": "Закрытие вклада"},
-        {"description": "Открытие вклада"},
-        ], ""))
+print(
+    search_operations_by_description(
+        [
+            {"description": "Перевод с карты на карту"},
+            {"description": "Перевод с карты на карту"},
+            {"description": "Перевод организации"},
+            {"description": "Перевод организации"},
+            {"description": "Перевод со счета на счет"},
+            {"description": "Закрытие вклада"},
+            {"description": "Открытие вклада"},
+        ],
+        "",
+    )
+)
 print("_" * 13)  # для разделения
 
-print("Подсчет транзакций по категориям")
-print(count_operations_by_category(
-    [
-        {"description": "Перевод с карты на карту"},
-        {"description": "Перевод с карты на карту"},
-        {"description": "Перевод организации"},
-        {"description": "Перевод организации"},
-        {"description": "Перевод со счета на счет"},
-        {"description": "Закрытие вклада"},
-        {"description": "Открытие вклада"},
-        ], ))
+print("Подсчет транзакций по категориям банковских операций")
+print(count_operations_by_category(transactions, categories))
+
 print("_" * 13)  # для разделения
-
-
-
-
-
-
-

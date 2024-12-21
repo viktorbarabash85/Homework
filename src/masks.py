@@ -7,7 +7,12 @@ logger = setup_logger("masks", "masks")
 
 
 def get_mask_card_number(card_number: Union[int, str]) -> Union[str]:
-    """Маскирует номер банковской карты"""
+    """
+    Маскирует номер банковской карты
+
+    :param card_number: принимает на вход номер карты
+    :return: возвращает замаскированный номер карты в формате XXXX XX** **** XXXX
+    """
     # Преобразуем номер карты в строку и удаляем пробелы
     card_number_str = str(card_number).strip()
 
@@ -24,7 +29,12 @@ def get_mask_card_number(card_number: Union[int, str]) -> Union[str]:
 
 
 def get_mask_account(account_number: Union[int, str]) -> Union[str]:
-    """Маскирует номер банковского счета"""
+    """
+    Маскирует номер банковского счета
+
+    :param account_number: принимает на вход номер банковского счета
+    :return: замаскированный номер банковского счета в формате **XXXX
+    """
     account_number_str = str(account_number)
     if account_number_str.isdigit() and int(account_number) != 0 and len(account_number_str) == 20:
         masked_account = "*" * 2 + account_number_str[-4:]
