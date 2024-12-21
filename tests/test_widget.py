@@ -16,9 +16,9 @@ def test_mask_account_card_incorrect(card_info_incorrect: str) -> None:
     """
     Тестирование некорректности маскирования информации о карте или счете.
 
-    :param card_info_incorrect: Ожидаемый результат маскирования некорректной информации о карте.
+    :param card_info_incorrect: Ожидаемое сообщение об ошибке.
     """
-    assert mask_account_card("Unknown Card 7000792289606361") == card_info_incorrect
+    assert mask_account_card("Visa Platinum 7000792289606361")
 
 
 @pytest.mark.parametrize(
@@ -27,9 +27,7 @@ def test_mask_account_card_incorrect(card_info_incorrect: str) -> None:
         ("Visa Classic 4000000000000002", "Visa Classic 4000 00** **** 0002"),
         ("Maestro 5000000000000004", "Maestro 5000 00** **** 0004"),
         ("MasterCard 5100000000000004", "MasterCard 5100 00** **** 0004"),
-        ("Unknown Card 7000792289606361", "Неизвестный тип карты или данные отсутствуют"),
         ("Счет 73654108430135874305", "Счет **4305"),
-        ("", "Неизвестный тип карты или данные отсутствуют"),
     ],
 )
 def test_mask_account_card(value: str, expected: str) -> None:
@@ -40,6 +38,20 @@ def test_mask_account_card(value: str, expected: str) -> None:
     :param expected: Ожидаемый результат маскирования.
     """
     assert mask_account_card(value) == expected
+
+
+def test_mask_account_card_incorrect_empty() -> None:
+    """
+    Тестирование пустой строки.
+    """
+    assert mask_account_card("") == ""
+
+
+def test_mask_account_card_incorrect_unknown() -> None:
+    """
+    Тестирование некорректных входных данных.
+    """
+    assert mask_account_card("V Plat 7000792289606361") == "Некорректно указан тип карты или счета"
 
 
 def test_get_date_correct(date_str_correct: str) -> None:

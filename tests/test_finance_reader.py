@@ -49,12 +49,7 @@ class TestFinanceReader(unittest.TestCase):
 
     @patch("pandas.read_csv")
     def test_read_transactions_from_csv_with_nrows(self, mock_read_csv: Any) -> None:
-        """Тестирование функции чтения транзакций из CSV файла с параметром nrows.
-
-        Этот тест проверяет, что при использовании параметра nrows функция
-        корректно загружает только указанное количество строк из CSV файла.
-        В данном случае проверяется, что возвращается только первая строка.
-        """
+        """Тестирование функции чтения транзакций из CSV файла с параметром nrows."""
         mock_read_csv.return_value = pd.DataFrame(
             {
                 "id": [1, 2],
@@ -70,7 +65,10 @@ class TestFinanceReader(unittest.TestCase):
         )
 
         # Чтение только одной строки
-        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv", nrows=1)
+        nrows = 1
+        result: List[Dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv", nrows=nrows)
+
+        # Ожидаемый результат
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,
@@ -84,6 +82,8 @@ class TestFinanceReader(unittest.TestCase):
                 "description": "Payment",
             }
         ]
+
+        # Проверка результата
         self.assertEqual(result, expected)
 
     @patch("pandas.read_excel")
@@ -146,7 +146,8 @@ class TestFinanceReader(unittest.TestCase):
         )
 
         # Чтение только одной строки
-        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx", nrows=1)
+        nrows = 1
+        result: list[dict[Hashable, Any]] = read_transactions_from_excel("fake_path.xlsx", nrows=nrows)
         expected: List[Dict[str, Any]] = [
             {
                 "id": 1,

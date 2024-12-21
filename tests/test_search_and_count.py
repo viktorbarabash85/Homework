@@ -1,11 +1,11 @@
-from typing import Any, Dict, List
+from typing import Any
 from unittest.mock import patch
 
 import pytest
 
 from src.search_and_count import count_operations_by_category, search_operations_by_description
 
-mock_operations: List[Dict[str, Any]] = [
+mock_operations: list[dict] = [
     {
         "id": 441945886,
         "state": "EXECUTED",
@@ -30,7 +30,6 @@ mock_operations: List[Dict[str, Any]] = [
         "date": "2020-01-01T12:00:00",
         "operationAmount": {"amount": "1000.00", "currency": {"name": "EUR", "code": "EUR"}},
         "description": "Открытие вклада",
-        "from": "",
         "to": "Счет 12345678901234567890",
     },
 ]
@@ -71,16 +70,15 @@ mock_operations: List[Dict[str, Any]] = [
                     "date": "2020-01-01T12:00:00",
                     "operationAmount": {"amount": "1000.00", "currency": {"name": "EUR", "code": "EUR"}},
                     "description": "Открытие вклада",
-                    "from": "",
                     "to": "Счет 12345678901234567890",
                 }
             ],
         ),
-        ("закрытие", []),  # Ожидаем, что не будет найдено ни одной операции
-        ("", "Необходимо ввести слово для поиска."),  # Ожидаем сообщение об ошибке при пустом запросе
+        ("закрытие", []),  # Ожидаем пустой список, что не будет найдено ни одной операции
+        ("", []),  # Ожидаем пустой список, т.к. не введено слово для поиска
     ],
 )
-def test_search_operations_by_description(operations: List[Dict[str, Any]], search_term: str, expected: Any) -> None:
+def test_search_operations_by_description(operations: list[dict], search_term: str, expected: Any) -> None:
     """
     Тестирование функции поиска операций по описанию.
 
@@ -92,23 +90,8 @@ def test_search_operations_by_description(operations: List[Dict[str, Any]], sear
     assert result == expected  # Проверяем, совпадает ли результат с ожидаемым
 
 
-def test_count_operations_by_category(operations: List[Dict[str, Any]]) -> None:
-    """
-    Тестирование функции подсчета операций по категориям.
-
-    :param operations: Список операций, предоставленных фикстурой.
-    """
-    expected_count: Dict[str, int] = {
-        "Перевод организации": 2,  # Ожидаем, что будет 2 операции с этой категорией
-        "Открытие вклада": 1,  # Ожидаем, что будет 1 операция с этой категорией
-    }
-
-    result = count_operations_by_category(operations, {})
-    assert result == expected_count  # Проверяем, совпадает ли результат с ожидаемым
-
-
 @patch("src.search_and_count.search_operations_by_description")
-def test_search_operations_with_mock(mock_get_operations, operations: List[Dict[str, Any]]) -> None:
+def test_search_operations_with_mock(mock_get_operations: Any, operations: list[dict]) -> None:
     """
     Тестирование функции поиска операций с использованием mock.
 
@@ -145,22 +128,72 @@ def test_search_operations_with_mock(mock_get_operations, operations: List[Dict[
     assert result == expected  # Проверяем, совпадает ли результат с ожидаемым
 
 
-@patch("src.search_and_count.count_operations_by_category")
-def test_count_operations_with_mock(mock_get_operations, operations: List[Dict[str, Any]]) -> None:
+def test_count_operations_by_category(operations: list[dict], categories: list[str]) -> None:
     """
-    Тестирование функции подсчета операций с использованием mock.
+    Тестирование функции подсчета операций по категориям.
 
-    :param mock_get_operations: Имитация функции получения операций.
+    :param operations: Список операций, предоставленных фикстурой.
     """
-    # Настраиваем mock, чтобы он возвращал наши тестовые данные
-    mock_get_operations.return_value = mock_operations
-
-    # Теперь вызываем функцию, которая использует get_operations
-    operations = mock_get_operations()  # Получаем операции через mock
-    expected_count: Dict[str, int] = {
-        "Перевод организации": 2,  # Ожидаем, что будет 2 операции с этой категорией
-        "Открытие вклада": 1,  # Ожидаем, что будет 1 операция с этой категорией
+    expected_count = {
+        "Перевод с карты на карту": 0,
+        "Открытие вклада": 1,
+        "Закрытие вклада": 0,
+        "Перевод организации": 2,
+        "Перевод со счета на счет": 0,
     }
 
-    result = count_operations_by_category(operations, {})
+    result = count_operations_by_category(operations, categories)
     assert result == expected_count  # Проверяем, совпадает ли результат с ожидаемым
+
+
+# Дополнительный тест для проверки работы с категориями, которых нет в транзакциях
+def test_count_operations_no_matches() -> None:
+    """
+    Тестируем функцию count_operations_by_category, когда нет совпадений с категориями.
+    Ожидаем, что все категории будут иметь значение 0.
+    """
+
+    transactions = [
+        {"description": "Перевод с карты на карту"},
+        {"description": "Открытие вклада"},
+    ]
+    categories = ["Перевод организации", "Закрытие вклада", "Перевод на счет"]
+
+    # Ожидаемый результат
+    expected_result = {"Перевод организации": 0, "Закрытие вклада": 0, "Перевод на счет": 0}
+
+    # Выполнение тестируемой функции
+    result = count_operations_by_category(transactions, categories)
+
+    # Проверка результата
+    assert result == expected_result
+
+
+def test_count_operations_by_category_with_empty_categories() -> None:
+    """
+    Тестирование функции count_operations_by_category с пустым списком категорий.
+    Ожидаем, что функция вызовет ValueError.
+    """
+    transactions = [{"description": "Перевод организации"}]
+    categories: list[str] = []
+
+    try:
+        count_operations_by_category(transactions, categories)
+    except ValueError as e:
+        assert str(e) == "Отсутствует описание категории."
+
+
+# Дополнительный тест для проверки работы с пустыми данными
+def test_count_operations_empty() -> None:
+    """
+    Тестируем функцию count_operations_by_category с пустым списком транзакций.
+    Ожидаем, что все категории будут иметь значение 0.
+    """
+
+    transactions: list[dict] = []
+    categories = ["Перевод с карты на карту", "Открытие вклада", "Перевод организации"]
+
+    try:
+        count_operations_by_category(transactions, categories)
+    except ValueError as e:
+        assert str(e) == "Отсутствует список транзакций."

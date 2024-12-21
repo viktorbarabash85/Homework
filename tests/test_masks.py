@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pandas as pd
 
 from src.finance_reader import read_transactions_from_csv, read_transactions_from_excel
-from src.masks import get_mask_card_number, get_mask_account
+from src.masks import get_mask_account, get_mask_card_number
 
 
 def test_get_mask_card_number_correct(card_number_correct: str) -> None:
@@ -44,7 +44,6 @@ def test_get_mask_account_incorrect(account_number_incorrect: str) -> None:
     assert get_mask_account("73654108430135874305332222") == account_number_incorrect
 
 
-
 class TestFinanceReader(unittest.TestCase):
     """Тестовый класс для проверки функций чтения транзакций из CSV и Excel файлов."""
 
@@ -80,43 +79,6 @@ class TestFinanceReader(unittest.TestCase):
                 "from": "Счет 58803664561298323391",
                 "to": "Счет 39745660563456619397",
                 "description": "Перевод организации",
-            }
-        ]
-        self.assertEqual(result, expected)
-
-    @patch("pandas.read_csv")
-    def test_read_transactions_from_csv_with_nrows(self, mock_read_csv: Any) -> None:
-        """
-        Тестирование функции чтения транзакций из CSV файла с параметром nrows.
-
-        :param mock_read_csv: Мок объекта для функции pandas.read_csv.
-        """
-        mock_read_csv.return_value = pd.DataFrame(
-            {
-                "id": [1, 2],
-                "state": ["completed", "pending"],
-                "date": ["2023-01-01", "2023-01-02"],
-                "amount": [100, 200],
-                "currency_name": ["USD", "USD"],
-                "currency_code": ["USD", "USD"],
-                "from": ["Alice", "Bob"],
-                "to": ["Bob", "Charlie"],
-                "description": ["Payment", "Transfer"],
-            }
-        )
-
-        result: list[dict[Hashable, Any]] = read_transactions_from_csv("fake_path.csv", nrows=1)
-        expected: List[Dict[str, Any]] = [
-            {
-                "id": 1,
-                "state": "completed",
-                "date": "2023-01-01",
-                "amount": 100,
-                "currency_name": "USD",
-                "currency_code": "USD",
-                "from": "Alice",
-                "to": "Bob",
-                "description": "Payment",
             }
         ]
         self.assertEqual(result, expected)

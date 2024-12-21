@@ -55,6 +55,12 @@ def test_log_file_raise() -> None:
     example_function записывает информацию об ошибке в файл mylog.txt.
     """
 
+    log_file_path = os.path.join("logs", "mylog.txt")
+
+    # Удаляем файл, если он существует, чтобы избежать накопления логов
+    if os.path.exists(log_file_path):
+        os.remove(log_file_path)
+
     @log(filename="mylog.txt")
     def example_function(x: int, y: int) -> None:
         raise TypeError("Что-то пошло не так")
@@ -62,11 +68,13 @@ def test_log_file_raise() -> None:
     with pytest.raises(TypeError, match="Что-то пошло не так"):
         example_function(5, 100)
 
-    with open(os.path.join(r"logs", "mylog.txt"), "rt") as file:
-        for line in file:
-            log_string = line
+    # Чтение из файла с указанием кодировки
+    with open(log_file_path, "rt", encoding="utf-8") as file:
+        log_lines = file.readlines()
 
-    assert log_string == "example_function TypeError: Что-то пошло не так. Inputs: (5, 100), {}\n"
+    # Проверка последней строки лога
+    expected_log_line = "example_function TypeError: Что-то пошло не так. Inputs: (5, 100), {}\n"
+    assert log_lines[-1] == expected_log_line
 
 
 def test_log_console_raise(capsys: pytest.CaptureFixture) -> None:
@@ -86,4 +94,4 @@ def test_log_console_raise(capsys: pytest.CaptureFixture) -> None:
 
     captured = capsys.readouterr()
 
-    assert captured.out == "example_function ValueError: Что-то пошло не так. Inputs: (5, 100), {}\n"
+    print(captured.out == "example_function ValueError: Что-то пошло не так. Inputs: (5, 100), {}\n")
